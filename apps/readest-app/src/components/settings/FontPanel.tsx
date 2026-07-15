@@ -27,6 +27,7 @@ import { isTauriAppPlatform } from '@/services/environment';
 import { useResetViewSettings } from '@/hooks/useResetSettings';
 import { useKeyDownActions } from '@/hooks/useKeyDownActions';
 import { saveViewSettings } from '@/helpers/settings';
+import { resolveDefaultFontFamily } from '@/utils/style';
 import { SettingsPanelPanelProp } from './SettingsDialog';
 import { BoxedList, NavigationRow, SettingLabel, SettingsRow } from './primitives';
 import NumberInput from './NumberInput';
@@ -108,6 +109,10 @@ const FontPanel: React.FC<SettingsPanelPanelProp> = ({ bookKey, onRegisterReset 
     {
       option: 'Sans-serif',
       label: _('Sans-Serif Font'),
+    },
+    {
+      option: 'System',
+      label: _('System Font'),
     },
   ];
 
@@ -279,16 +284,12 @@ const FontPanel: React.FC<SettingsPanelPanelProp> = ({ bookKey, onRegisterReset 
   }, [overrideFont]);
 
   const handleFontFamilyFont = (option: string) => {
-    switch (option) {
-      case 'Serif':
-        return `'${serifFont}', serif`;
-      case 'Sans-serif':
-        return `'${sansSerifFont}', sans-serif`;
-      case 'Monospace':
-        return `'${monospaceFont}', monospace`;
-      default:
-        return '';
-    }
+    if (option === 'Monospace') return `'${monospaceFont}', monospace`;
+    return resolveDefaultFontFamily(
+      option,
+      `'${serifFont}', serif`,
+      `'${sansSerifFont}', sans-serif`,
+    );
   };
 
   if (fontPanelView === 'custom-fonts') {

@@ -349,6 +349,17 @@ const FoliateViewer: React.FC<{
         mountCustomFont(detail.doc, font);
       });
 
+      if (
+        process.env.NODE_ENV !== 'production' &&
+        appService?.isAndroidApp &&
+        viewSettings.defaultFont === 'System'
+      ) {
+        const computedFontFamily = detail.doc.defaultView?.getComputedStyle(
+          detail.doc.documentElement,
+        ).fontFamily;
+        console.info('[System Font Debug] EPUB documentElement font-family:', computedFontFamily);
+      }
+
       if (bookDoc.rendition?.layout === 'pre-paginated') {
         applyFixedlayoutStyles(detail.doc, viewSettings);
         const themeCode = getThemeCode();

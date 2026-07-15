@@ -11,6 +11,7 @@ import {
   getParagraphActionForZone,
   getParagraphPresentation,
 } from '@/utils/paragraphPresentation';
+import { DEFAULT_BOOK_FONT } from '@/services/constants';
 
 const currentViewSettings = {
   paragraphMode: { enabled: true },
@@ -371,6 +372,45 @@ describe('paragraph mode', () => {
     await waitFor(() => {
       expect(dispatchSpy).toHaveBeenCalledWith('paragraph-next', { bookKey: overlayBookKey });
     });
+  });
+
+  it('uses the system UI font chain in the paragraph overlay', async () => {
+    const overlayBookKey = 'system-font-overlay-book';
+    const doc = createDoc('<p>Hello world</p>');
+    const paragraph = doc.querySelector('p')!;
+    const range = doc.createRange();
+    range.selectNodeContents(paragraph);
+
+    const { container } = render(
+      <ParagraphOverlay
+        bookKey={overlayBookKey}
+        dimOpacity={0.3}
+        viewSettings={
+          {
+            ...DEFAULT_BOOK_FONT,
+            defaultFont: 'System',
+            writingMode: 'horizontal-tb',
+            vertical: false,
+            rtl: false,
+          } as never
+        }
+      />,
+    );
+
+    await act(async () => {
+      await eventDispatcher.dispatch('paragraph-focus', {
+        bookKey: overlayBookKey,
+        range,
+        presentation: { dir: 'ltr', writingMode: 'horizontal-tb', vertical: false, rtl: false },
+      });
+    });
+
+    const paragraphContent = await waitFor(() => {
+      const node = container.querySelector('.paragraph-content') as HTMLDivElement | null;
+      expect(node).not.toBeNull();
+      return node!;
+    });
+    expect(paragraphContent.style.fontFamily).toBe('system-ui, sans-serif');
   });
 
   const renderVisibleOverlay = async (onClose: () => void) => {

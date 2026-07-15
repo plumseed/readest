@@ -15,6 +15,7 @@ import {
 import { getTextSubRange } from '@/services/tts/wordHighlight';
 import { loadShortcuts } from '@/helpers/shortcuts';
 import { matchesShortcut } from '@/utils/shortcutKeys';
+import { getBaseFontFamily } from '@/utils/style';
 import TTSFollowIndicator, { TtsSyncStatus } from '../tts/TTSFollowIndicator';
 import { buildTtsHighlightCssText } from './paragraphTts';
 
@@ -162,12 +163,8 @@ const ParagraphOverlay: React.FC<ParagraphOverlayProps> = ({
 
   const contentStyle = useMemo(() => {
     if (!viewSettings) return {};
-    const defaultFontFamily =
-      viewSettings.defaultFont?.toLowerCase() === 'serif'
-        ? `"${viewSettings.serifFont}", serif`
-        : `"${viewSettings.sansSerifFont}", sans-serif`;
     return {
-      fontFamily: defaultFontFamily,
+      fontFamily: getBaseFontFamily(viewSettings),
       fontSize: `${viewSettings.defaultFontSize || 16}px`,
       lineHeight: viewSettings.lineHeight || 1.6,
       letterSpacing: viewSettings.letterSpacing ? `${viewSettings.letterSpacing}px` : undefined,

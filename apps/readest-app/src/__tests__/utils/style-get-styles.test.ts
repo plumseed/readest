@@ -79,6 +79,20 @@ describe('getFontStyles branches (via getStyles)', () => {
     expect(css).toContain('font-family: var(--sans-serif)');
   });
 
+  it('uses the unquoted system UI generic chain when defaultFont is "System"', () => {
+    const vs = makeViewSettings({ defaultFont: 'System' });
+    const css = getStyles(vs, theme);
+    expect(css).toContain('font-family: system-ui, sans-serif');
+    expect(css).not.toContain('font-family: "system-ui"');
+  });
+
+  it('uses the system UI generic chain with !important when font override is enabled', () => {
+    const vs = makeViewSettings({ defaultFont: 'System', overrideFont: true });
+    const css = getStyles(vs, theme);
+    expect(css).toContain('font-family: system-ui, sans-serif !important');
+    expect(css).toContain('font-family: revert !important');
+  });
+
   it('adds !important when overrideFont is true', () => {
     const vs = makeViewSettings({ overrideFont: true, defaultFont: 'Serif' });
     const css = getStyles(vs, theme);

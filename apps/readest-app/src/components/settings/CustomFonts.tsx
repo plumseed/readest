@@ -44,11 +44,14 @@ const CustomFonts: React.FC<CustomFontsProps> = ({ bookKey, onBack }) => {
 
   const { selectFiles } = useFileSelector(appService, _);
 
-  const currentDefaultFont =
-    viewSettings.defaultFont.toLowerCase() === 'serif' ? 'serif' : 'sans-serif';
+  const currentDefaultFont = viewSettings.defaultFont.toLowerCase();
 
   const currentFontFamily =
-    currentDefaultFont === 'serif' ? viewSettings.serifFont : viewSettings.sansSerifFont;
+    currentDefaultFont === 'system'
+      ? null
+      : currentDefaultFont === 'serif'
+        ? viewSettings.serifFont
+        : viewSettings.sansSerifFont;
 
   const handleImportFont = () => {
     selectFiles({ type: 'fonts', multiple: true }).then(async (result) => {
@@ -110,7 +113,11 @@ const CustomFonts: React.FC<CustomFontsProps> = ({ bookKey, onBack }) => {
     if (currentDefaultFont === 'serif') {
       saveViewSettings(envConfig, bookKey, 'serifFont', family.name);
     } else {
-      saveViewSettings(envConfig, bookKey, 'sansSerifFont', family.name);
+      void saveViewSettings(envConfig, bookKey, 'sansSerifFont', family.name).then(async () => {
+        if (currentDefaultFont === 'system') {
+          await saveViewSettings(envConfig, bookKey, 'defaultFont', 'Sans-serif');
+        }
+      });
     }
   };
 

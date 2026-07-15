@@ -57,3 +57,7 @@ result*
 # 忽略所有目录下的 .gradle 临时文件夹
 .gradle/
 **/android/.gradle/
+
+# 忽略构建输出（可选，防止编译出的 apk/aar 被追踪）
+**/android/build/
+build/

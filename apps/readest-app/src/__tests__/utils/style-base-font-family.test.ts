@@ -29,6 +29,13 @@ describe('getBaseFontFamily', () => {
     expect(family.trimEnd().endsWith('sans-serif')).toBe(true);
   });
 
+  it('returns the unquoted system UI generic chain when defaultFont is "System"', () => {
+    const vs = makeFontSettings({ defaultFont: 'System' });
+    const family = getBaseFontFamily(vs);
+    expect(family).toBe('system-ui, sans-serif');
+    expect(family).not.toContain('"system-ui"');
+  });
+
   it('places a custom serif font at the head of the chain', () => {
     const vs = makeFontSettings({ defaultFont: 'Serif', serifFont: 'My Custom Font' });
     const family = getBaseFontFamily(vs);

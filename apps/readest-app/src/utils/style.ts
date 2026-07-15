@@ -5,6 +5,7 @@ import {
   FALLBACK_FONTS,
   CJK_SANS_SERIF_FONTS,
   CJK_SERIF_FONTS,
+  DEFAULT_BOOK_FONT,
 } from '@/services/constants';
 import { ViewSettings } from '@/types/book';
 import {
@@ -17,6 +18,23 @@ import {
 import { createFontCSS, CustomFont } from '@/styles/fonts';
 import { getOSPlatform } from './misc';
 import { SCROLL_WRAPPER_CLASS, SCROLL_WRAPPER_FIT_CLASS } from './scrollable';
+
+export const SYSTEM_FONT_FAMILY = 'system-ui, sans-serif';
+
+export const resolveDefaultFontFamily = (
+  defaultFont: string | undefined,
+  serifFamily: string,
+  sansSerifFamily: string,
+): string => {
+  switch (defaultFont?.toLowerCase()) {
+    case 'system':
+      return SYSTEM_FONT_FAMILY;
+    case 'serif':
+      return serifFamily;
+    default:
+      return sansSerifFamily;
+  }
+};
 
 /**
  * Build the resolved CSS font-family lists (serif / sans-serif / monospace)
@@ -69,12 +87,16 @@ const buildFontFamilyLists = (
  */
 export const getBaseFontFamily = (viewSettings: ViewSettings): string => {
   const families = buildFontFamilyLists(
-    viewSettings.serifFont!,
-    viewSettings.sansSerifFont!,
-    viewSettings.monospaceFont!,
-    viewSettings.defaultCJKFont!,
+    viewSettings.serifFont || DEFAULT_BOOK_FONT.serifFont,
+    viewSettings.sansSerifFont || DEFAULT_BOOK_FONT.sansSerifFont,
+    viewSettings.monospaceFont || DEFAULT_BOOK_FONT.monospaceFont,
+    viewSettings.defaultCJKFont || DEFAULT_BOOK_FONT.defaultCJKFont,
   );
-  return viewSettings.defaultFont!.toLowerCase() === 'serif' ? families.serif : families.sansSerif;
+  return resolveDefaultFontFamily(
+    viewSettings.defaultFont!,
+    families.serif,
+    families.sansSerif,
+  );
 };
 
 const getFontStyles = (
@@ -89,7 +111,11 @@ const getFontStyles = (
   overrideFont: boolean,
 ) => {
   const families = buildFontFamilyLists(serif, sansSerif, monospace, defaultCJKFont);
-  const defaultFontFamily = defaultFont.toLowerCase() === 'serif' ? '--serif' : '--sans-serif';
+  const defaultFontFamily = resolveDefaultFontFamily(
+    defaultFont,
+    'var(--serif)',
+    'var(--sans-serif)',
+  );
   const fontStyles = `
     html {
       --serif: ${families.serif};
@@ -107,11 +133,11 @@ const getFontStyles = (
     }
     /* lower specificity than ebook built-in font styles */
     html {
-      font-family: var(${defaultFontFamily}) ${overrideFont ? '!important' : ''};
+      font-family: ${defaultFontFamily} ${overrideFont ? '!important' : ''};
     }
     /* higher specificity than ebook built-in font styles */
     html body {
-      ${overrideFont ? `font-family: var(${defaultFontFamily}) !important;` : ''}
+      ${overrideFont ? `font-family: ${defaultFontFamily} !important;` : ''}
     }
     font[size="1"] {
       font-size: ${minFontSize}px;

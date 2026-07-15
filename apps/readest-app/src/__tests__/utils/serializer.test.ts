@@ -20,6 +20,21 @@ const defaultSearchConfig = {
 } as BookSearchConfig;
 
 describe('BookConfig serialization', () => {
+  it('persists the per-book System font semantic value', () => {
+    const global = { ...globalViewSettings, defaultFont: 'Sans-serif' } as ViewSettings;
+    const config = {
+      updatedAt: 123,
+      viewSettings: { defaultFont: 'System' },
+      searchConfig: {},
+    } as BookConfig;
+
+    const serialized = serializeConfig(config, global, defaultSearchConfig);
+    expect(JSON.parse(serialized).viewSettings.defaultFont).toBe('System');
+
+    const hydrated = deserializeConfig(serialized, global, defaultSearchConfig);
+    expect(hydrated.viewSettings?.defaultFont).toBe('System');
+  });
+
   it('writes schemaVersion to settings-aware config JSON using camelCase', () => {
     const config: BookConfig = {
       updatedAt: 123,
