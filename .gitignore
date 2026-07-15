@@ -54,3 +54,6 @@ result*
 .claude/worktrees
 .claude/settings.local.json
 
+# 忽略所有目录下的 .gradle 临时文件夹
+.gradle/
+**/android/.gradle/
