@@ -1,0 +1,18 @@
+[package]
+name = "turso_ext"
+version = "0.6.1"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/tursodatabase/turso"
+description = "Turso extensions core"
+
+[features]
+vfs = []
+core_only = []
+static = []
+
+[dependencies]
+turso_macros = "0.6.1"
+getrandom = "0.4.2"
+chrono = { version = "0.4.42", default-features = true }
+
